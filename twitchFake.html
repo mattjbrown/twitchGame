@@ -1,0 +1,29 @@
+<img src="teepo.png" style="display: none;" />
+
+<audio style="display: none;">
+    <source src="ahahaha.mp3" type="audio/mpeg">
+</audio>
+
+<canvas id="overLayer" width="1280" height="720" style="position:absolute; left:0px; top: 0px; z-index: 3">
+</canvas>
+
+<script src="http://cdn.tmijs.org/js/latest/tmi.js"></script>
+<script src="http://underscorejs.org/underscore-min.js"></script>
+<script src="https://code.responsivevoice.org/responsivevoice.js"></script>
+<script src="utilities.js"></script>
+<script src="gameyBits.js"></script>
+<script src="drawHUD.js"></script>
+<script src="twitchChatIntegration.js"></script>
+<script>
+
+var canvasSizeX = 1280;
+var canvasSizeY = 720;
+
+var overlay = document.getElementById("overLayer");
+
+var intervalDelay = 25;
+
+setInterval(function () {
+    showCrapAroundScreen(overlay);
+}, intervalDelay);
+</script>
