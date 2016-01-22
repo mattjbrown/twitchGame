@@ -4,7 +4,7 @@ var options = {
     },
     identity: {
         username: 'BotvanGS',
-        password: 'oauth:se4tqz9b1nmll3jr7o6ficaafyvqby'
+        password: oAuthPass
     },
     connection: {
         random: "chat",
@@ -19,7 +19,7 @@ var options2 = {
     },
     identity: {
         username: 'BotvanGS',
-        password: 'oauth:se4tqz9b1nmll3jr7o6ficaafyvqby'
+        password: oAuthPass
     },
     connection: {
         random: "group",
