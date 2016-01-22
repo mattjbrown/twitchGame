@@ -102,6 +102,8 @@ var enemyList = [{
 }];
 
 var battleActors;
+var recentBattleActions;
+var maxLogMsgs = 15;
 
 var timePointer = 100;
 var inBattle = false;
@@ -122,28 +124,33 @@ function startBattle() {
         };
     });
     
+    recentBattleActions = [];
+    
     decideWhoGoesNext();
 }
 
 function decideWhoGoesNext() {
     var nextActor;
     
-    battleActors.forEach(function (actor) {
-        if (actor.nextTurn <= timePointer && (!nextActor || actor.nextTurn > nextActor.nextTurn)) {
-            nextActor = actor;
+    while (!nextActor) {
+        var nextActor = false;
+        
+        battleActors.forEach(function (actor) {
+            if (actor.nextTurn <= timePointer && (!nextActor || actor.nextTurn > nextActor.nextTurn)) {
+                nextActor = actor;
+            }
+        });
+            
+        if (!nextActor) {
+            timePointer = 100;
+            continue;
         }
-    });
-    
-    if (!nextActor) {
-        timePointer = 100;
-        decideWhoGoesNext();
-        return;
-    }
-    
-    timePointer = nextActor.nextTurn;
-    nextActor.nextTurn = nextActor.nextTurn - calculateTimeBetweenTurns(nextActor.speed);
-    if (nextActor.nextTurn < 0) {
-        nextActor.nextTurn = 100 - Math.abs(nextActor.nextTurn);
+        
+        timePointer = nextActor.nextTurn;
+        nextActor.nextTurn = nextActor.nextTurn - calculateTimeBetweenTurns(nextActor.speed);
+        if (nextActor.nextTurn < 0) {
+            nextActor.nextTurn = 100 - Math.abs(nextActor.nextTurn);
+        }
     }
     
     var actorIsEnemy = _.find(enemyList, function (enemy) {
@@ -152,6 +159,7 @@ function decideWhoGoesNext() {
     
     if (actorIsEnemy) {
         //take enemy turn!
+        addToBattleLog(nextActor.name + " was loafing around...");
         decideWhoGoesNext();
     } else {
         nextPlayer = nextActor;
@@ -159,8 +167,8 @@ function decideWhoGoesNext() {
 }
 
 function takePlayerTurn(player, targets) {
-    var rawAttack = (rng(80, 130) / 100) * player.power;
-    console.log(player.name + " did " + rawAttack + " damage to " + targets.join());
+    var rawAttack = Math.Floor((rng(80, 130) / 100) * player.power);
+    addToBattleLog(player.name + " did " + rawAttack + " damage to " + targets.join());
     
     decideWhoGoesNext();
 }
@@ -222,4 +230,12 @@ function getNext5Actors() {
 
 function calculateTimeBetweenTurns(speed) {
     return Math.floor(100 * (10 / (speed + 10)));
+}
+
+function addToBattleLog(message) {
+    recentBattleActions.unshift(message);
+    
+    if (recentBattleActions.length > maxLogMsgs) {
+        recentBattleActions.pop();
+    }
 }

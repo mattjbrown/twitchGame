@@ -6,6 +6,7 @@ function showCrapAroundScreen(canvas) {
     drawPanes(context, canvas);
     drawPaneLabels(context, canvas);
     drawNextActorList(context, canvas);
+    drawCombatLog(context, canvas);
     
     //context.fillText('Combat Log', dxStart + (canvas.width - dxStart)/2, 30);
 }
@@ -70,6 +71,26 @@ function drawNextActorList(context, canvas) {
     
     actorsToDraw.forEach(function (actor) {
         context.fillText(actor.name, dxStart, dyStart + 30 * counter++);
+    });
+}
+
+function drawCombatLog(context, canvas) {
+    if (!recentBattleActions) {
+        return;
+    }
+    
+    var dxStart = 940;
+    var dyStart = 60;
+    
+    context.font = "32px Final Fantasy VII";
+    context.fillStyle = 'white';
+    
+    var counter = 0;
+    
+    recentBattleActions.forEach(function (message) {
+        context.fillText(message, dxStart, dyStart + 30 * counter++);
+        var rgb = 255 - (15 * counter);
+        context.fillStyle = 'rgb(' +  rgb + ',' + rgb + ',' + rgb + ')';
     });
 }
 
