@@ -79,7 +79,7 @@ function drawCombatLog(context, canvas) {
         return;
     }
     
-    var dxStart = 940;
+    var dxStart = 920;
     var dyStart = 60;
     
     context.font = "32px Final Fantasy VII";
@@ -89,7 +89,7 @@ function drawCombatLog(context, canvas) {
     
     recentBattleActions.forEach(function (message) {
         context.fillText(message, dxStart, dyStart + 30 * counter++);
-        var rgb = 255 - (15 * counter);
+        var rgb = 255 - (10 * counter);
         context.fillStyle = 'rgb(' +  rgb + ',' + rgb + ',' + rgb + ')';
     });
 }

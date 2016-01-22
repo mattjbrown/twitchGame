@@ -5,7 +5,7 @@ var playerList = [{
     maxMP: 30,
     curHP: 5,
     curMP: 30,
-    speed: 90,
+    speed: 1,
     power: 20
 }];
 var maxPlayers = 2;
@@ -39,11 +39,13 @@ var enemyList = [{
     attacks: [
     {
         name: 'lumbering swing',
-        power: 5
+        power: 5,
+        chance: 67
     },
     {
         name: 'heavy swing',
-        power: 10
+        power: 10,
+        chance: 33
     }]
 },
 {
@@ -71,7 +73,7 @@ var enemyList = [{
     curHP: 50,
     maxMP: 0,
     curMP: 0,
-    speed: 60,
+    speed: 20,
     attacks: [
     {
         name: 'lumbering swing',
@@ -159,15 +161,17 @@ function decideWhoGoesNext() {
     
     if (actorIsEnemy) {
         //take enemy turn!
-        addToBattleLog(nextActor.name + " was loafing around...");
-        decideWhoGoesNext();
+        setTimeout(function () {
+            addToBattleLog(nextActor.name + " was loafing around...");
+            decideWhoGoesNext();
+        }, 1000);
     } else {
         nextPlayer = nextActor;
     }
 }
 
 function takePlayerTurn(player, targets) {
-    var rawAttack = Math.Floor((rng(80, 130) / 100) * player.power);
+    var rawAttack = Math.floor((rng(80, 130) / 100) * player.power);
     addToBattleLog(player.name + " did " + rawAttack + " damage to " + targets.join());
     
     decideWhoGoesNext();
