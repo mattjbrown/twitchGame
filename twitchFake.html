@@ -1,5 +1,8 @@
 <img src="bgs/forest.png" style="display: none;" />
-<img id="enemyImg" src="enemies/goblin.png" style="display: none;" />
+<img id="goblin" src="enemies/goblin.png" style="display: none;" />
+<img id="imp" src="enemies/imp.png" style="display: none;" />
+<img id="armorKnight" src="enemies/armorKnight.png" style="display: none;" />
+<img id="unknown" src="enemies/unknown.png" style="display: none;" />
 <img id="playerImg" src="playerImgs/IvanGPX.png" style="display: none;" />
 
 <audio style="display: none;">
@@ -16,6 +19,7 @@
 <script src="server/playerData/save.json"></script>
 <script src="creds.js"></script>
 <script src="utilities.js"></script>
+<script src="enemyScripts.js"></script>
 <script src="gameyBits.js"></script>
 <script src="drawHUD.js"></script>
 <script src="twitchChatIntegration.js"></script>
@@ -41,8 +45,8 @@ function backupPlayerData() {
     var dataString = 'var savedData=' + JSON.stringify(playerList);
     console.log(dataString);
 
-    $.post("http://localhost:8005/saveGameData", dataString, function(code) {
+    /*$.post("http://localhost:8005/saveGameData", dataString, function(code) {
         console.log(code);
-    });
+    });*/
 }
 </script>

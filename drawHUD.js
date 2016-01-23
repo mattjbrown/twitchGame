@@ -118,6 +118,15 @@ function drawCharacters(context, canvas) {
     context.fillStyle = "white";
     context.textAlign = "center";
     
+    if (!battleActors) {
+        return;
+    }
+    
+    var previousSpriteHeight = 0;
+    var previousSpriteWidth = 0;
+    
+    var enemySizes = [];
+    
     battleActors.forEach(function (actor) {
         if (actor.isEnemy) {
             if (actor.fainted) {
@@ -125,23 +134,45 @@ function drawCharacters(context, canvas) {
                 return;
             }
             
-            var row = Math.floor(enemyCount / 3);
-            var x = enemyOffsetX + (row * 110)
-            var y = offsetY + (row % 2) * rowOffsetY + (enemyCount % 3) * 120
-            
             context.strokeStyle = 'red';
             context.lineWidth = 3;
+            context.textAlign = 'center';
             
             context.font = "32px Final Fantasy VII";
-            context.strokeText(actor.name, x + 40, y - 10);
-            context.fillText(actor.name, x + 40 , y  - 10);
             
-            context.drawImage(document.getElementById('enemyImg'), x, y, 80, 80);
+            var sprite = document.getElementById(actor.characterStats.spriteInfo);
+            
+            if (!sprite) {
+                sprite = document.getElementById('unknown');
+            }
+            
+            enemySizes[enemyCount] = { width: sprite.width, height: sprite.height };
+            
+            var row = Math.floor(enemyCount / 3);
+            var positionInRow = enemyCount % 3;
+            
+            var x = enemyOffsetX;
+            var y = offsetY + (row % 2) * rowOffsetY;
+            
+            for (var i = 1; i < positionInRow + 1; i++) {
+                y += enemySizes[enemyCount - i].height;
+                y += 30;
+            }
+            
+            context.strokeText(actor.name, x + (sprite.width / 2), y - 10);
+            context.fillText(actor.name, x + (sprite.width / 2), y  - 10);
+            
+            context.drawImage(sprite, x, y, sprite.width, sprite.height);
             
             if (nextPlayer.name === actor.name) {
                 context.strokeStyle = 'red';
                 context.lineWidth = 2;
-                context.strokeRect(x - 5, y - 5, 90, 90);
+                context.strokeRect(x - 5, y - 5, sprite.width + 10, sprite.height + 10);
+            }
+            
+            if (positionInRow === 2) {
+                enemyOffsetX += Math.max(sprite.width, enemySizes[enemyCount - 1].width, enemySizes[enemyCount - 2].width);
+                enemyOffsetX += 30;
             }
             
             enemyCount++;

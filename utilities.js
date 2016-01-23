@@ -2,6 +2,12 @@ function rng(min, max) {
     return min + Math.floor(Math.random() * (max - min + 1));
 }
 
+function rngBiasTowardsCenter(min, max) {
+    var rand = (Math.random() + Math.random()) / 2;
+    
+    return min + Math.floor(rand * (max - min + 1));
+}
+
 function rngColor() {
     var r = 255*Math.random()|0,
         g = 255*Math.random()|0,

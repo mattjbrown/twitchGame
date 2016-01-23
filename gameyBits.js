@@ -1,4 +1,4 @@
-var playerList = savedData || [];
+var playerList = [];
 var maxPlayers = 4;
 
 var enemyList = [{
@@ -92,38 +92,24 @@ var timePointer = 100;
 var inBattle = false;
 var nextPlayer = false;
 
+var enemyTurnProcessor;
+
 function startBattle() {
     timePointer = 100;
     inBattle = true;
+    
+    if (enemyTurnProcessor) {
+        clearTimeout(enemyTurnProcessor);
+    }
     
     //fetch enemies
     //decide on players
     //other stuff?
     battleActors = _.map(playerList, function (actor) {
-        return {
-            name: actor.name,
-            nextTurn: 100 - calculateTimeBetweenTurns(actor.speed),
-            speed: actor.speed,
-            fainted: false,
-            curHP: actor.maxHP,
-            curMP: actor.maxMP,
-            characterStats: actor,
-            isEnemy: false
-        };
+        return convertToBattleActor(actor, false);
     });
     
-    battleActors = battleActors.concat(_.map(enemyList, function (actor) {
-        return {
-            name: actor.name,
-            nextTurn: 100 - calculateTimeBetweenTurns(actor.speed),
-            speed: actor.speed,
-            fainted: false,
-            curHP: actor.maxHP,
-            curMP: actor.maxMP,
-            characterStats: actor,
-            isEnemy: true
-        };
-    }));
+    battleActors = battleActors.concat(chooseRandomEnemies(50));
     
     recentBattleActions = [];
     
@@ -166,7 +152,7 @@ function decideWhoGoesNext() {
         //take enemy turn!
         nextPlayer = nextActor;
         
-        setTimeout(function () {
+        enemyTurnProcessor = setTimeout(function () {
             addToBattleLog(nextActor.name + " was loafing around...");
             decideWhoGoesNext();
         }, 1000);
@@ -289,4 +275,17 @@ function checkForBattleFinished() {
     }
     
     return 0;
+}
+
+function convertToBattleActor(character, isEnemy) {
+    return {
+            name: character.name,
+            nextTurn: 100 - calculateTimeBetweenTurns(character.speed),
+            speed: character.speed,
+            fainted: false,
+            curHP: character.maxHP,
+            curMP: character.maxMP,
+            characterStats: character,
+            isEnemy: isEnemy
+        };
 }
