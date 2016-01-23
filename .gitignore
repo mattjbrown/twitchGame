@@ -3,3 +3,4 @@ bgs/
 enemies/
 playerImgs/
 server/playerData/save.json
+server/playerData/save.js

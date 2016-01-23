@@ -1,88 +1,5 @@
-var playerList = [];
-var maxPlayers = 4;
-
-var enemyList = [{
-    name: 'Spork-Slowest',
-    level: 2,
-    maxHP: 50,
-    maxMP: 0,
-    speed: 2,
-    attacks: [
-    {
-        name: 'lumbering swing',
-        power: 5
-    },
-    {
-        name: 'heavy swing',
-        power: 10
-    }]
-},
-{
-    name: 'Spork-Mid',
-    level: 2,
-    maxHP: 50,
-    maxMP: 0,
-    speed: 5,
-    attacks: [
-    {
-        name: 'lumbering swing',
-        power: 5,
-        chance: 67
-    },
-    {
-        name: 'heavy swing',
-        power: 10,
-        chance: 33
-    }]
-},
-{
-    name: 'Spork-MidSlow',
-    level: 2,
-    maxHP: 50,
-    maxMP: 0,
-    speed: 4,
-    attacks: [
-    {
-        name: 'lumbering swing',
-        power: 5
-    },
-    {
-        name: 'heavy swing',
-        power: 10
-    }]
-},
-{
-    name: 'Spork-Fast',
-    level: 2,
-    maxHP: 50,
-    maxMP: 0,
-    speed: 20,
-    attacks: [
-    {
-        name: 'lumbering swing',
-        power: 5
-    },
-    {
-        name: 'heavy swing',
-        power: 10
-    }]
-},
-{
-    name: 'Spork-MidFast',
-    level: 2,
-    maxHP: 50,
-    maxMP: 0,
-    speed: 8,
-    attacks: [
-    {
-        name: 'lumbering swing',
-        power: 5
-    },
-    {
-        name: 'heavy swing',
-        power: 10
-    }]
-}];
+var playerList = (typeof savedData === 'undefined') ? [] : savedData;
+var maxPlayers = 6;
 
 var battleActors = [];
 var recentBattleActions;
@@ -102,9 +19,6 @@ function startBattle() {
         clearTimeout(enemyTurnProcessor);
     }
     
-    //fetch enemies
-    //decide on players
-    //other stuff?
     battleActors = _.map(playerList, function (actor) {
         return convertToBattleActor(actor, false);
     });
