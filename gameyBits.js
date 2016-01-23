@@ -1,11 +1,4 @@
-var playerList = [{
-    name: 'IvanGPX',
-    level: 10,
-    maxHP: 20,
-    maxMP: 30,
-    speed: 5,
-    power: 20
-}];
+var playerList = savedData || [];
 var maxPlayers = 4;
 
 var enemyList = [{

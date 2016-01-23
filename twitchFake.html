@@ -12,6 +12,8 @@
 <script src="http://cdn.tmijs.org/js/latest/tmi.js"></script>
 <script src="http://underscorejs.org/underscore-min.js"></script>
 <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
+<script src="http://code.jquery.com/jquery-2.2.0.min.js"></script>
+<script src="server/playerData/save.json"></script>
 <script src="creds.js"></script>
 <script src="utilities.js"></script>
 <script src="gameyBits.js"></script>
@@ -25,8 +27,22 @@ var canvasSizeY = 720;
 var overlay = document.getElementById("overLayer");
 
 var intervalDelay = 25;
+var playerBackupTime = 6000;
 
 setInterval(function () {
     showCrapAroundScreen(overlay);
 }, intervalDelay);
+
+setInterval(function () {
+    backupPlayerData();
+}, playerBackupTime);
+
+function backupPlayerData() {
+    var dataString = 'var savedData=' + JSON.stringify(playerList);
+    console.log(dataString);
+
+    $.post("http://localhost:8005/saveGameData", dataString, function(code) {
+        console.log(code);
+    });
+}
 </script>
