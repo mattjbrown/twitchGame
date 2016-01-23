@@ -3,20 +3,16 @@ var playerList = [{
     level: 10,
     maxHP: 20,
     maxMP: 30,
-    curHP: 5,
-    curMP: 30,
-    speed: 1,
+    speed: 5,
     power: 20
 }];
-var maxPlayers = 2;
+var maxPlayers = 4;
 
 var enemyList = [{
     name: 'Spork-Slowest',
     level: 2,
     maxHP: 50,
-    curHP: 50,
     maxMP: 0,
-    curMP: 0,
     speed: 2,
     attacks: [
     {
@@ -32,9 +28,7 @@ var enemyList = [{
     name: 'Spork-Mid',
     level: 2,
     maxHP: 50,
-    curHP: 50,
     maxMP: 0,
-    curMP: 0,
     speed: 5,
     attacks: [
     {
@@ -52,9 +46,7 @@ var enemyList = [{
     name: 'Spork-MidSlow',
     level: 2,
     maxHP: 50,
-    curHP: 50,
     maxMP: 0,
-    curMP: 0,
     speed: 4,
     attacks: [
     {
@@ -70,9 +62,7 @@ var enemyList = [{
     name: 'Spork-Fast',
     level: 2,
     maxHP: 50,
-    curHP: 50,
     maxMP: 0,
-    curMP: 0,
     speed: 20,
     attacks: [
     {
@@ -88,9 +78,7 @@ var enemyList = [{
     name: 'Spork-MidFast',
     level: 2,
     maxHP: 50,
-    curHP: 50,
     maxMP: 0,
-    curMP: 0,
     speed: 8,
     attacks: [
     {
@@ -103,7 +91,7 @@ var enemyList = [{
     }]
 }];
 
-var battleActors;
+var battleActors = [];
 var recentBattleActions;
 var maxLogMsgs = 15;
 
@@ -118,13 +106,31 @@ function startBattle() {
     //fetch enemies
     //decide on players
     //other stuff?
-    battleActors = _.map(playerList.concat(enemyList), function (actor) {
+    battleActors = _.map(playerList, function (actor) {
         return {
             name: actor.name,
             nextTurn: 100 - calculateTimeBetweenTurns(actor.speed),
-            speed: actor.speed
+            speed: actor.speed,
+            fainted: false,
+            curHP: actor.maxHP,
+            curMP: actor.maxMP,
+            characterStats: actor,
+            isEnemy: false
         };
     });
+    
+    battleActors = battleActors.concat(_.map(enemyList, function (actor) {
+        return {
+            name: actor.name,
+            nextTurn: 100 - calculateTimeBetweenTurns(actor.speed),
+            speed: actor.speed,
+            fainted: false,
+            curHP: actor.maxHP,
+            curMP: actor.maxMP,
+            characterStats: actor,
+            isEnemy: true
+        };
+    }));
     
     recentBattleActions = [];
     
@@ -134,11 +140,19 @@ function startBattle() {
 function decideWhoGoesNext() {
     var nextActor;
     
+    var battleOver = checkForBattleFinished();
+    if (battleOver > 0) {
+        //award stuff
+    }
+    if (battleOver < 0) {
+        //game over stuff
+    }
+    
     while (!nextActor) {
         var nextActor = false;
         
         battleActors.forEach(function (actor) {
-            if (actor.nextTurn <= timePointer && (!nextActor || actor.nextTurn > nextActor.nextTurn)) {
+            if (!actor.fainted && actor.nextTurn <= timePointer && (!nextActor || actor.nextTurn > nextActor.nextTurn)) {
                 nextActor = actor;
             }
         });
@@ -155,12 +169,10 @@ function decideWhoGoesNext() {
         }
     }
     
-    var actorIsEnemy = _.find(enemyList, function (enemy) {
-        return enemy.name === nextActor.name;
-    });
-    
-    if (actorIsEnemy) {
+    if (nextActor.isEnemy) {
         //take enemy turn!
+        nextPlayer = nextActor;
+        
         setTimeout(function () {
             addToBattleLog(nextActor.name + " was loafing around...");
             decideWhoGoesNext();
@@ -174,6 +186,8 @@ function takePlayerTurn(player, targets) {
     var rawAttack = Math.floor((rng(80, 130) / 100) * player.power);
     addToBattleLog(player.name + " did " + rawAttack + " damage to " + targets.join());
     
+    processDamage(player, targets, rawAttack);
+    
     decideWhoGoesNext();
 }
 
@@ -186,7 +200,8 @@ function createPlayer(name) {
         curHP: 10,
         curMP: 10,
         speed: 30,
-        power: 30
+        power: 30,
+        status: []
     }
     
     playerList.push(newPlayer);
@@ -210,7 +225,7 @@ function getNext5Actors() {
         var nextActorToGo = false;
         
         actorClones.forEach(function (actor) {
-            if (actor.nextTurn <= pretendTimer && (!nextActorToGo || actor.nextTurn > nextActorToGo.nextTurn)) {
+            if (!actor.fainted && actor.nextTurn <= pretendTimer && (!nextActorToGo || actor.nextTurn > nextActorToGo.nextTurn)) {
                 nextActorToGo = actor;
             }
         });
@@ -242,4 +257,43 @@ function addToBattleLog(message) {
     if (recentBattleActions.length > maxLogMsgs) {
         recentBattleActions.pop();
     }
+}
+
+function processDamage(dealer, targets, damage) {
+    //damage formula stuff, but for now...
+    battleActors.forEach(function (actor) {
+        if (!_.contains(targets, actor.name)) {
+            return;
+        }
+        
+        actor.curHP = actor.curHP - damage;
+        
+        if (actor.curHP <= 0) {
+            actor.fainted = true;
+            addToBattleLog(actor.name + " has fainted.");
+        }        
+    });
+}
+
+function checkForBattleFinished() {
+    var anyEnemies = false;
+    var anyPlayers = false;
+    battleActors.forEach(function (actor) {
+        if (!actor.fainted) {
+            if (actor.isEnemy) {
+                anyEnemies = true;
+            } else {
+                anyPlayers = true;
+            }
+        }
+    });
+    
+    if (!anyPlayers) {
+        return -1;
+    }    
+    if (!anyEnemies) {
+        return 1;
+    }
+    
+    return 0;
 }

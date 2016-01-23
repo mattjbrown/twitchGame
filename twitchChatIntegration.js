@@ -45,14 +45,14 @@ function getCommandDetails(user, message) {
     var userName = user['display-name'];
     
     if (command === '!status') {
-        var player = _.find(playerList, function (player) {
+        var player = _.find(battleActors, function (player) {
            return player.name.toLowerCase() === userName.toLowerCase();
         });
         
         if (player) {
             var statusString = "" + 
-            "HP: " + player.curHP + "/" + player.maxHP + ", " +
-            "MP: " + player.curMP + "/" + player.maxMP + ", " +
+            "HP: " + player.curHP + "/" + player.characterStats.maxHP + ", " +
+            "MP: " + player.curMP + "/" + player.characterStats.maxMP + ", " +
             "LV: " + player.level;
             groupClient.whisper(userName, statusString);
         }
@@ -77,7 +77,7 @@ function getCommandDetails(user, message) {
         }
     }
     
-    if (command === '!spoilersCommand') {
+    if (command === '!attack') {
         var player = _.find(playerList, function (player) {
            return player.name.toLowerCase() === userName.toLowerCase();
         });
@@ -88,7 +88,7 @@ function getCommandDetails(user, message) {
         
         if (nextPlayer.name === player.name) {
             var target = commandBits.shift();
-            var enemyNames = _.pluck(enemyList, 'name');
+            var enemyNames = _.pluck(_.where(battleActors, { isEnemy: true, fainted: false }), 'name');
             
             if (target && _.contains(enemyNames, target)) {
                 takePlayerTurn(player, [ target ]);
@@ -100,4 +100,15 @@ function getCommandDetails(user, message) {
             groupClient.whisper(userName, "It's not your turn, dummy!");
         }
     }
+    
+    if (command === '!battlestart' && userName === 'IvanGPX') {
+        startBattle();
+    }
+}
+
+function debugCommand(message, userName) {
+    var user = {};
+    user['display-name'] = userName || 'IvanGPX';
+    
+    getCommandDetails(user, message);
 }

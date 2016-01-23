@@ -8,6 +8,8 @@ function showCrapAroundScreen(canvas) {
     drawNextActorList(context, canvas);
     drawCombatLog(context, canvas);
     
+    drawCharacters(context, canvas);
+    
     //context.fillText('Combat Log', dxStart + (canvas.width - dxStart)/2, 30);
 }
 
@@ -49,6 +51,7 @@ function drawPaneLabels(context, canvas) {
     
     context.font = "50px Final Fantasy VII";
     context.fillStyle = 'white';
+    context.textAlign = 'left';
     
     context.fillText('Combat Log', topPaneXStart + 10, 25);
     context.fillText('Upcoming Turns', brPaneXStart + 10, brPaneYStart + 25);
@@ -64,6 +67,7 @@ function drawNextActorList(context, canvas) {
     
     context.font = "45px Final Fantasy VII";
     context.fillStyle = 'white';
+    context.textAlign = 'left';
     
     var actorsToDraw = getNext5Actors();
     
@@ -84,6 +88,7 @@ function drawCombatLog(context, canvas) {
     
     context.font = "32px Final Fantasy VII";
     context.fillStyle = 'white';
+    context.textAlign = 'left';
     
     var counter = 0;
     
@@ -91,6 +96,86 @@ function drawCombatLog(context, canvas) {
         context.fillText(message, dxStart, dyStart + 30 * counter++);
         var rgb = 255 - (10 * counter);
         context.fillStyle = 'rgb(' +  rgb + ',' + rgb + ',' + rgb + ')';
+    });
+}
+
+function drawCharacters(context, canvas) {
+    dxStart = 0;
+    dyStart = 0;
+    width = 898;
+    height = 498;
+    
+    var playerCount = 0;
+    var enemyCount = 0;
+    
+    context.drawImage(document.getElementsByTagName('img')[0], dxStart, dyStart, width, height);
+    
+    var enemyOffsetX = 100;
+    var playerOffsetX = 700;
+    var offsetY = 100;
+    var rowOffsetY = 50;
+    
+    context.fillStyle = "white";
+    context.textAlign = "center";
+    
+    battleActors.forEach(function (actor) {
+        if (actor.isEnemy) {
+            if (actor.fainted) {
+                enemyCount++;
+                return;
+            }
+            
+            var row = Math.floor(enemyCount / 3);
+            var x = enemyOffsetX + (row * 110)
+            var y = offsetY + (row % 2) * rowOffsetY + (enemyCount % 3) * 120
+            
+            context.strokeStyle = 'red';
+            context.lineWidth = 3;
+            
+            context.font = "32px Final Fantasy VII";
+            context.strokeText(actor.name, x + 40, y - 10);
+            context.fillText(actor.name, x + 40 , y  - 10);
+            
+            context.drawImage(document.getElementById('enemyImg'), x, y, 80, 80);
+            
+            if (nextPlayer.name === actor.name) {
+                context.strokeStyle = 'red';
+                context.lineWidth = 2;
+                context.strokeRect(x - 5, y - 5, 90, 90);
+            }
+            
+            enemyCount++;
+        }
+        else {
+            var row = Math.floor(playerCount / 3);
+            var x = playerOffsetX + (row * 100)
+            var y = offsetY + (row % 2) * rowOffsetY + (playerCount % 3) * 120
+            
+            context.strokeStyle = 'green';
+            context.lineWidth = 3;
+            
+            context.font = "32px Final Fantasy VII";
+            context.strokeText(actor.name, x + 40, y - 10);
+            context.fillText(actor.name, x + 40 , y  - 10);
+            
+            if (!actor.fainted) {
+                context.drawImage(document.getElementById('playerImg'), x, y, 80, 80);
+            } else {
+                context.save();
+                context.translate(x + 80, y);
+                context.rotate(90 * Math.PI/180);
+                context.drawImage(document.getElementById('playerImg'), 0, 0, 80, 80);
+                context.restore();
+            }
+            
+            if (nextPlayer.name === actor.name) {
+                context.strokeStyle = 'green';
+                context.lineWidth = 2;
+                context.strokeRect(x - 5, y - 5, 90, 90);
+            }
+            
+            playerCount++;
+        }
     });
 }
 
