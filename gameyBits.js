@@ -9,21 +9,31 @@ var timePointer = 100;
 var inBattle = false;
 var nextPlayer = false;
 
-var enemyTurnProcessor;
+var nextTurnProcessor;
+
+var battleEnemyActors = [];
+var battlePlayerActors = [];
+
+var battleWon = false;
+var battleLost = false;
 
 function startBattle() {
     timePointer = 100;
     inBattle = true;
+    battleWon = false;
+    battleLost = false;
+    battleActors = [];
     
-    if (enemyTurnProcessor) {
-        clearTimeout(enemyTurnProcessor);
+    if (nextTurnProcessor) {
+        clearTimeout(nextTurnProcessor);
     }
     
-    battleActors = _.map(playerList, function (actor) {
-        return convertToBattleActor(actor, false);
+    battlePlayerActors = _.map(playerList, function (player) {
+        return convertToBattleActor(player, false, player.baseHP, player.baseMP);
     });
+    battleEnemyActors = _.map(chooseRandomEnemies(15));
     
-    battleActors = battleActors.concat(chooseRandomEnemies(50));
+    battleActors = battleActors.concat(battlePlayerActors).concat(battleEnemyActors);
     
     recentBattleActions = [];
     
@@ -36,9 +46,11 @@ function decideWhoGoesNext() {
     var battleOver = checkForBattleFinished();
     if (battleOver > 0) {
         //award stuff
+        battleWon = true;
     }
     if (battleOver < 0) {
         //game over stuff
+        battleLost = true;
     }
     
     while (!nextActor) {
@@ -62,42 +74,15 @@ function decideWhoGoesNext() {
         }
     }
     
-    if (nextActor.isEnemy) {
-        //take enemy turn!
-        nextPlayer = nextActor;
+    nextPlayer = nextActor;
+    
+    if (nextActor.isEnemy) {        
+        processEnemyTurn(nextActor, battleEnemyActors, battlePlayerActors);
         
-        enemyTurnProcessor = setTimeout(function () {
-            addToBattleLog(nextActor.name + " was loafing around...");
+        nextTurnProcessor = setTimeout(function () {
             decideWhoGoesNext();
-        }, 1000);
-    } else {
-        nextPlayer = nextActor;
+        }, 2000);
     }
-}
-
-function takePlayerTurn(player, targets) {
-    var rawAttack = Math.floor((rng(80, 130) / 100) * player.power);
-    addToBattleLog(player.name + " did " + rawAttack + " damage to " + targets.join());
-    
-    processDamage(player, targets, rawAttack);
-    
-    decideWhoGoesNext();
-}
-
-function createPlayer(name) {
-    var newPlayer = {
-        name: name,
-        level: 1,
-        maxHP: 10,
-        maxMP: 10,
-        curHP: 10,
-        curMP: 10,
-        speed: 30,
-        power: 30,
-        status: []
-    }
-    
-    playerList.push(newPlayer);
 }
 
 function getNext5Actors() {
@@ -163,6 +148,7 @@ function processDamage(dealer, targets, damage) {
         
         if (actor.curHP <= 0) {
             actor.fainted = true;
+            actor.curHP = 0;
             addToBattleLog(actor.name + " has fainted.");
         }        
     });
@@ -191,14 +177,14 @@ function checkForBattleFinished() {
     return 0;
 }
 
-function convertToBattleActor(character, isEnemy) {
+function convertToBattleActor(character, isEnemy, hp, mp) {
     return {
             name: character.name,
             nextTurn: 100 - calculateTimeBetweenTurns(character.speed),
             speed: character.speed,
             fainted: false,
-            curHP: character.maxHP,
-            curMP: character.maxMP,
+            curHP: hp,
+            curMP: mp,
             characterStats: character,
             isEnemy: isEnemy
         };

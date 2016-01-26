@@ -19,6 +19,7 @@
 <script src="server/playerData/save.js"></script>
 <script src="creds.js"></script>
 <script src="utilities.js"></script>
+<script src="playerScripts.js"></script>
 <script src="enemyScripts.js"></script>
 <script src="gameyBits.js"></script>
 <script src="drawHUD.js"></script>
@@ -31,7 +32,7 @@ var canvasSizeY = 720;
 var overlay = document.getElementById("overLayer");
 
 var intervalDelay = 25;
-var playerBackupTime = 6000;
+var playerBackupTime = 60000;
 
 setInterval(function () {
     showCrapAroundScreen(overlay);

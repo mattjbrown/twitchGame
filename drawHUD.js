@@ -4,13 +4,22 @@ function showCrapAroundScreen(canvas) {
     context.clearRect(0, 0, canvas.width, canvas.height);
     
     drawPanes(context, canvas);
+    
+    if (battleWon) {
+        drawWin(context, canvas);
+        return;
+    }
+    
+    if (battleLost) {
+        drawLoss(context, canvas);
+        return;
+    }
+    
     drawPaneLabels(context, canvas);
     drawNextActorList(context, canvas);
     drawCombatLog(context, canvas);
     
     drawCharacters(context, canvas);
-    
-    //context.fillText('Combat Log', dxStart + (canvas.width - dxStart)/2, 30);
 }
 
 function drawPanes(context, canvas) {
@@ -128,12 +137,7 @@ function drawCharacters(context, canvas) {
     var enemySizes = [];
     
     battleActors.forEach(function (actor) {
-        if (actor.isEnemy) {
-            if (actor.fainted) {
-                enemyCount++;
-                return;
-            }
-            
+        if (actor.isEnemy) {            
             context.strokeStyle = 'red';
             context.lineWidth = 3;
             context.textAlign = 'center';
@@ -154,6 +158,16 @@ function drawCharacters(context, canvas) {
             var x = enemyOffsetX;
             var y = offsetY + (row % 2) * rowOffsetY;
             
+            if (positionInRow === 2) {
+                enemyOffsetX += Math.max(sprite.width, enemySizes[enemyCount - 1].width, enemySizes[enemyCount - 2].width);
+                enemyOffsetX += 30;
+            }
+            
+            if (actor.fainted) {
+                enemyCount++;
+                return;
+            }
+            
             for (var i = 1; i < positionInRow + 1; i++) {
                 y += enemySizes[enemyCount - i].height;
                 y += 30;
@@ -165,14 +179,13 @@ function drawCharacters(context, canvas) {
             context.drawImage(sprite, x, y, sprite.width, sprite.height);
             
             if (nextPlayer.name === actor.name) {
+                context.strokeStyle = 'white';
+                context.lineWidth = 4;
+                context.strokeRect(x - 5, y - 5, sprite.width + 10, sprite.height + 10);
+                
                 context.strokeStyle = 'red';
                 context.lineWidth = 2;
                 context.strokeRect(x - 5, y - 5, sprite.width + 10, sprite.height + 10);
-            }
-            
-            if (positionInRow === 2) {
-                enemyOffsetX += Math.max(sprite.width, enemySizes[enemyCount - 1].width, enemySizes[enemyCount - 2].width);
-                enemyOffsetX += 30;
             }
             
             enemyCount++;
@@ -180,14 +193,17 @@ function drawCharacters(context, canvas) {
         else {
             var row = Math.floor(playerCount / 3);
             var x = playerOffsetX + (row * 100)
-            var y = offsetY + (row % 2) * rowOffsetY + (playerCount % 3) * 120
+            var y = offsetY + (row % 2) * rowOffsetY + (playerCount % 3) * 130
             
             context.strokeStyle = 'green';
             context.lineWidth = 3;
             
             context.font = "32px Final Fantasy VII";
-            context.strokeText(actor.name, x + 40, y - 10);
-            context.fillText(actor.name, x + 40 , y  - 10);
+            context.strokeText(actor.name, x + 40, y - 30);
+            context.fillText(actor.name, x + 40 , y  - 30);
+            
+            context.strokeText(actor.curHP + '/ ' + actor.characterStats.baseHP, x + 40, y - 10);
+            context.fillText(actor.curHP + '/ ' + actor.characterStats.baseHP, x + 40 , y  - 10);
             
             if (!actor.fainted) {
                 context.drawImage(document.getElementById('playerImg'), x, y, 80, 80);
@@ -200,6 +216,10 @@ function drawCharacters(context, canvas) {
             }
             
             if (nextPlayer.name === actor.name) {
+                context.strokeStyle = 'white';
+                context.lineWidth = 4;
+                context.strokeRect(x - 5, y - 5, 90, 90);
+                
                 context.strokeStyle = 'green';
                 context.lineWidth = 2;
                 context.strokeRect(x - 5, y - 5, 90, 90);
@@ -210,10 +230,26 @@ function drawCharacters(context, canvas) {
     });
 }
 
+function drawWin(context, canvas) {
+    context.font = "100px Final Fantasy VII";
+    context.fillStyle = 'black';
+    context.textAlign = 'left';
+    
+    context.fillText("YOU'RE WINNER!", 100, 100);
+}
+
+function drawLoss(context, canvas) {
+    context.font = "100px Final Fantasy VII";
+    context.fillStyle = 'black';
+    context.textAlign = 'left';
+    
+    context.fillText("YOU'RE LOSER!", 100, 100);
+}
+
 function drawLine(context, x1, y1, x2, y2) {
     context.beginPath();
     context.moveTo(x1, y1); 
     context.lineTo(x2, y2);
     context.stroke();
     context.closePath();  
-} 
+}

@@ -73,7 +73,7 @@ function getCommandDetails(user, message) {
                         
             groupClient.whisper(userName, "The game is currently full. Current players are: " + playerNames.join());
         } else {
-            createPlayer(userName);
+            createNewPlayer(userName);
         }
     }
     
