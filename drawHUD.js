@@ -99,11 +99,11 @@ function drawCombatLog(context, canvas) {
     context.fillStyle = 'white';
     context.textAlign = 'left';
     
-    var counter = 0;
+    var counter = 14;
     
     recentBattleActions.forEach(function (message) {
-        context.fillText(message, dxStart, dyStart + 30 * counter++);
-        var rgb = 255 - (10 * counter);
+        context.fillText(message, dxStart, dyStart + 30 * counter--);
+        var rgb = 105 + (10 * counter);
         context.fillStyle = 'rgb(' +  rgb + ',' + rgb + ',' + rgb + ')';
     });
 }
